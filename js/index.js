@@ -1148,6 +1148,7 @@ function loadStyles() {
 }
 
 let modalState = 1;
+let testTicketCount = 0;
 let standardTicketCount = 0;
 let VIPTicketCount = 0;
 let VVIPTicketCount = 0;
@@ -1181,6 +1182,11 @@ function loadUserDetails() {
   document.querySelector('#email-display').innerHTML = `${ user.email }`;
   document.querySelector('#product-list-total').innerHTML = `₦${ totalTicketCost }`;
 
+  if (testTicketCount > 0) {
+    document.querySelector('#product-list').innerHTML += `<dt class="text-sm">Test x ${ testTicketCount }</dt>`;
+    document.querySelector('#product-list-subtotals').innerHTML += `<dd class="text-sm">₦${ testTicketCount * 100 }</dd>`;
+  }
+
   if (standardTicketCount > 0) {
     document.querySelector('#product-list').innerHTML += `<dt class="text-sm">Standard x ${ standardTicketCount }</dt>`;
     document.querySelector('#product-list-subtotals').innerHTML += `<dd class="text-sm">₦${ standardTicketCount * 10000 }</dd>`;
@@ -1199,6 +1205,14 @@ function loadUserDetails() {
 
 function makePayment() {
   const receiptDetails = [];
+
+  if (testTicketCount > 0) {
+    receiptDetails.push({
+      name: 'Test Ticket',
+      price: 100,
+      quantity: testTicketCount
+    })
+  }
 
   if (standardTicketCount > 0) {
     receiptDetails.push({
@@ -1255,6 +1269,12 @@ function makePayment() {
 
 function updateTicketCount(value, type) {
   switch (type) {
+    case 'test':
+      testTicketCount += value;
+      if (testTicketCount <= 0) testTicketCount = 0;
+      else if (testTicketCount >= 100) testTicketCount = 100;
+      document.querySelector("#test-ticket-count").innerHTML = testTicketCount;
+      break;
     case 'standard':
       standardTicketCount += value;
       if (standardTicketCount <= 0) standardTicketCount = 0;
@@ -1275,7 +1295,7 @@ function updateTicketCount(value, type) {
       break;
   }
 
-  totalTicketCount = standardTicketCount + VIPTicketCount + VVIPTicketCount;
+  totalTicketCount = testTicketCount + standardTicketCount + VIPTicketCount + VVIPTicketCount;
 
   const selectTicketsSubmitButton = document.querySelector('#selectTicketsSubmitButton');
 
@@ -1289,7 +1309,7 @@ function updateTicketCount(value, type) {
     selectTicketsSubmitButton.disable();
   }
   document.querySelector("#total-ticket-count").innerHTML = totalTicketCount;
-  totalTicketCost = (standardTicketCount * 10000) + (VIPTicketCount * 50000) + (VVIPTicketCount * 100000);
+  totalTicketCost = (testTicketCount * 100) + (standardTicketCount * 10000) + (VIPTicketCount * 50000) + (VVIPTicketCount * 100000);
   document.querySelector("#total-ticket-cost").innerHTML = `₦${totalTicketCost}`;
 }
 
@@ -1559,6 +1579,55 @@ const firstModalScreen = `
                                   role="list"
                                   class="-my-6 divide-y divide-gray-200"
                                 >
+                                  <li class="flex py-2">
+                                    <div class="ml-4 flex flex-1 flex-col">
+                                      <div>
+                                        <div
+                                          class="flex justify-between text-base font-medium text-black"
+                                        >
+                                          <p class="font-bold">
+                                            <a href="#">Test </a>
+                                          </p>
+                                          <div class="ml-4">
+                                            <div
+                                              class="flex justify-center items-center"
+                                            >
+                                              <div>
+                                                <button
+                                                  class="text-lg text-black px-4 cursor-pointer"
+                                                  onclick="updateTicketCount(-1, 'test')"
+                                                >
+                                                  -
+                                                </button>
+                                              </div>
+                                              <div>
+                                                <h2
+                                                  class="text-2xl font-bold text-black"
+                                                  id="test-ticket-count"
+                                                >
+                                                  0
+                                                </h2>
+                                              </div>
+                                              <div>
+                                                <button
+                                                  class="text-lg text-black px-4 cursor-pointer"
+                                                  onclick="updateTicketCount(1, 'test')"
+                                                >
+                                                  +
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <p class="text-lg text-black font-bold">
+                                          ₦100
+                                        </p>
+                                        <p class="text-xs text-black">
+                                          100 Available
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </li>
                                   <li class="flex py-2">
                                     <div class="ml-4 flex flex-1 flex-col">
                                       <div>
